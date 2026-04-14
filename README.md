@@ -9,7 +9,6 @@ Aplikasi full-stack untuk manajemen user dengan backend Flask dan frontend Vue.j
 - [Struktur Folder](#struktur-folder)
 - [Prasyarat Instalasi](#prasyarat-instalasi)
 - [Panduan Instalasi Lengkap](#panduan-instalasi-lengkap)
-- [Konfigurasi Environment](#konfigurasi-environment)
 - [Menjalankan Project](#menjalankan-project)
 - [API Endpoints](#api-endpoints)
 - [Troubleshooting](#troubleshooting)
@@ -37,7 +36,7 @@ Aplikasi full-stack untuk manajemen user dengan backend Flask dan frontend Vue.j
 - **Flask-Migrate** - Database migration tool
 - **Flask-JWT-Extended** - JWT authentication
 - **Flask-CORS** - CORS support
-- **SQLite/PostgreSQL** - Database
+- **PostgreSQL** - Database (dengan pgAdmin4)
 - **python-dotenv** - Environment variables
 
 ### Frontend
@@ -59,7 +58,7 @@ horus-Samuel-exam/
 ├── backend/                       # Backend Flask
 │   ├── requirements.txt          # Python dependencies
 │   ├── run.py                    # Entry point aplikasi Flask
-│   ├── .env                      # Environment variables (buat sendiri)
+│   ├── .env                      # Environment variables (create yourself - NOT in repo)
 │   │
 │   └── app/
 │       ├── __init__.py           # App factory
@@ -146,8 +145,9 @@ Sebelum memulai, pastikan system anda memiliki:
   - Cek: `npm --version`
 
 ### Untuk Database
-- **SQLite** (default, sudah include dengan Python)
-- Atau **PostgreSQL** (optional, jika ingin menggunakan PostgreSQL)
+- **PostgreSQL 12+** (menggunakan pgAdmin4 untuk management)
+  - Download: https://www.postgresql.org/download/
+  - pgAdmin4: https://www.pgadmin.org/download/
 
 ---
 
@@ -197,27 +197,22 @@ Setelah aktivasi, terminal anda akan menampilkan `(venv)` di awal baris.
 ```bash
 # Install semua dependencies dari requirements.txt
 pip install -r requirements.txt
-
-# Atau install satu per satu (jika ingin tahu apa yang di-install):
-pip install Flask==2.3.0
-pip install Flask-SQLAlchemy==3.0.0
-pip install Flask-Migrate==4.0.0
-pip install Flask-JWT-Extended==4.4.0
-pip install Flask-CORS==4.0.0
-pip install python-dotenv==1.0.0
 ```
 
-**Dependencies yang diperlukan:**
-- Flask - Web framework
-- Flask-SQLAlchemy - Database ORM
-- Flask-Migrate - Database migrations
-- Flask-JWT-Extended - JWT authentication
-- Flask-CORS - CORS handling
-- python-dotenv - Environment variables
+#### 2d. Setup Environment Variables
 
-#### 2d. Setup Database
+Buat file `.env` di folder `backend/` dengan konfigurasi yang diperlukan:
+- Database connection string untuk PostgreSQL
+- Secret keys untuk JWT
+- Flask environment settings
+
+⚠️ **PENTING**: File `.env` harus dibuat secara lokal dan TIDAK di-commit ke repository untuk keamanan.
+
+#### 2e. Setup Database
 
 ```bash
+# Pastikan database PostgreSQL sudah dibuat di pgAdmin4 atau command line
+
 # Jalankan migrasi database
 flask db upgrade
 
@@ -237,73 +232,15 @@ cd frontend
 
 # Instalasi dependencies
 npm install
-
-# Atau lebih detail:
-npm install vue@3.4.21
-npm install vue-router@4.3.0
-npm install axios@1.6.8
-npm install vite@5.2.8 --save-dev
-npm install @vitejs/plugin-vue@5.0.4 --save-dev
-```
-
----
-
-## ⚙️ Konfigurasi Environment
-
-### Backend Configuration
-
-Buat file `.env` di folder `backend/` dengan konten berikut:
-
-```bash
-# Backend .env file
-# backend/.env
-
-# Flask Configuration
-FLASK_ENV=development
-FLASK_DEBUG=True
-
-# Database Configuration
-# Untuk SQLite (default):
-DATABASE_URL=sqlite:///app.db
-
-# Atau untuk PostgreSQL:
-# DATABASE_URL=postgresql://username:password@localhost:5432/horus_db
-
-# JWT Configuration
-SECRET_KEY=your-secret-key-here-change-this-in-production
-JWT_SECRET_KEY=your-jwt-secret-key-here-change-this-in-production
-
-# Server Configuration
-SERVER_PORT=5000
-SERVER_HOST=0.0.0.0
-```
-
-### Frontend Configuration (Optional)
-
-Sesuaikan `vite.config.js` jika diperlukan proxy API:
-
-```javascript
-// frontend/vite.config.js
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-
-export default defineConfig({
-  plugins: [vue()],
-  server: {
-    port: 3000,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-      }
-    }
-  }
-})
 ```
 
 ---
 
 ## ▶️ Menjalankan Project
+
+### Prerequisites
+- PostgreSQL service harus sudah berjalan
+- Database sudah dibuat dan `.env` sudah dikonfigurasi
 
 ### Menjalankan Backend
 
@@ -311,8 +248,7 @@ export default defineConfig({
 # Navigate ke folder backend (jika belum)
 cd backend
 
-# Pastikan virtual environment sudah aktif (lihat Step 2b)
-# Jika belum, jalankan:
+# Aktivasi virtual environment
 # Windows: venv\Scripts\activate
 # Linux/Mac: source venv/bin/activate
 
@@ -367,10 +303,10 @@ Content-Type: application/json
 
 Request Body:
 {
-  "username": "samueldevops",
-  "email": "samuel@example.com",
-  "password": "password123",
-  "nama": "Samuel"
+  "username": "<username>",
+  "email": "<email@example.com>",
+  "password": "<secure-password>",
+  "nama": "<full-name>"
 }
 
 Response (201 Created):
@@ -378,9 +314,9 @@ Response (201 Created):
   "message": "User berhasil didaftarkan",
   "user": {
     "id": 1,
-    "username": "samueldevops",
-    "email": "samuel@example.com",
-    "nama": "Samuel"
+    "username": "<username>",
+    "email": "<email@example.com>",
+    "nama": "<full-name>"
   }
 }
 ```
@@ -393,18 +329,18 @@ Content-Type: application/json
 
 Request Body:
 {
-  "username": "samueldevops",
-  "password": "password123"
+  "username": "<username>",
+  "password": "<secure-password>"
 }
 
 Response (200 OK):
 {
   "message": "Login berhasil",
-  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+  "access_token": "<jwt-token-received>",
   "user": {
     "id": 1,
-    "username": "samueldevops",
-    "email": "samuel@example.com"
+    "username": "<username>",
+    "email": "<email@example.com>"
   }
 }
 ```
@@ -420,9 +356,9 @@ Response (200 OK):
   "users": [
     {
       "id": 1,
-      "username": "samueldevops",
-      "email": "samuel@example.com",
-      "nama": "Samuel"
+      "username": "<username>",
+      "email": "<email@example.com>",
+      "nama": "<full-name>"
     }
   ]
 }
@@ -437,8 +373,8 @@ Content-Type: application/json
 
 Request Body:
 {
-  "nama": "Samuel Devops Updated",
-  "email": "samuel.new@example.com"
+  "nama": "<updated-full-name>",
+  "email": "<updated-email@example.com>"
 }
 
 Response (200 OK):
@@ -446,9 +382,9 @@ Response (200 OK):
   "message": "User berhasil diupdate",
   "user": {
     "id": 1,
-    "username": "samueldevops",
-    "email": "samuel.new@example.com",
-    "nama": "Samuel Devops Updated"
+    "username": "<username>",
+    "email": "<updated-email@example.com>",
+    "nama": "<updated-full-name>"
   }
 }
 ```
@@ -474,44 +410,23 @@ Response (200 OK):
 1. **Registrasi User Baru**
    - Method: POST
    - URL: http://localhost:5000/users/register
-   - Body (JSON):
-     ```json
-     {
-       "username": "testuser",
-       "email": "test@example.com",
-       "password": "testpass123",
-       "nama": "Test User"
-     }
-     ```
+   - Gunakan contoh request body dari API Endpoints section di atas
 
 2. **Login**
    - Method: POST
    - URL: http://localhost:5000/users/login
-   - Body (JSON):
-     ```json
-     {
-       "username": "testuser",
-       "password": "testpass123"
-     }
-     ```
-   - Copy `access_token` dari response
+   - Catat `access_token` yang diterima untuk digunakan di endpoint yang dilindungi
 
 3. **Get Users**
    - Method: GET
    - URL: http://localhost:5000/users
-   - Headers: `Authorization: Bearer <paste_token_dari_step_2>`
+   - Headers: `Authorization: Bearer <token_dari_login>`
 
 4. **Update User**
    - Method: PUT
    - URL: http://localhost:5000/users/1
    - Headers: `Authorization: Bearer <token>`
-   - Body (JSON):
-     ```json
-     {
-       "nama": "Test User Updated",
-       "email": "test.updated@example.com"
-     }
-     ```
+   - Gunakan request body contoh dari API Endpoints section
 
 5. **Delete User**
    - Method: DELETE
@@ -573,15 +488,15 @@ pip install Flask-CORS
 # cors.init_app(app)
 ```
 
-#### Error Database: "sqlite3.OperationalError: no such table"
+#### Error Database: "Connection refused" atau "FATAL: Ident authentication failed"
 ```bash
-# Solusi: Jalankan migrasi database
-cd backend
-flask db upgrade
+# Solusi: Periksa bahwa:
+# 1. PostgreSQL service sudah berjalan
+# 2. Database sudah dibuat
+# 3. .env memiliki DATABASE_URL yang benar
 
-# Atau buat ulang:
-rm app.db  # Hapus database lama
-flask db upgrade
+# Windows: Buka Services dan pastikan PostgreSQL berjalan
+# Linux/Mac: sudo systemctl status postgresql
 ```
 
 #### Port 5000 sudah digunakan
@@ -636,19 +551,15 @@ npm run dev
 
 ### General Issues
 
-#### Ingin reset database
+#### Database migration error
 ```bash
+# Solusi: Reset database dan migrasi ulang
 cd backend
 
-# Hapus file database
-rm app.db
-
-# Hapus migrasi (optional)
-rm -rf migrations/versions/*
-
-# Buat migrasi baru
-flask db migrate -m "Initial migration"
+# Jalankan upgrade migrasi
 flask db upgrade
+
+# Jika masih error, cek connection string di .env
 ```
 
 #### Port tidak bisa diakses dari machine lain
@@ -664,15 +575,15 @@ flask db upgrade
 
 ## 📝 Catatan Penting
 
-1. **Development vs Production**: Konfigurasi di `.env` adalah untuk development. Untuk production, gunakan environment variables yang lebih aman.
+1. **Environment Variables**: File `.env` HARUS dibuat secara lokal. Jangan pernah push ke repository.
 
-2. **Secret Key**: Ubah `SECRET_KEY` dan `JWT_SECRET_KEY` di `.env` dengan string random yang panjang untuk production.
+2. **Database**: Gunakan PostgreSQL untuk production. Pastikan service sudah berjalan sebelum menjalankan aplikasi.
 
-3. **Database**: Default menggunakan SQLite. Untuk production, disarankan menggunakan PostgreSQL.
+3. **CORS Configuration**: Backend sudah dikonfigurasi untuk menerima request dari frontend. Sesuaikan jika diperlukan perubahan.
 
-4. **CORS**: Backend sudah dikonfigurasi untuk menerima request dari frontend dengan CORS yang tepat.
+4. **Virtual Environment**: Selalu aktivasi virtual environment sebelum menjalankan backend untuk menghindari conflict dependencies.
 
-5. **JWT Token**: Token JWT valid selama waktu tertentu. Implementasi refresh token bisa ditambahkan untuk security lebih baik.
+5. **Dependencies**: Update requirements.txt setelah menambah package baru dengan: `pip freeze > requirements.txt`
 
 ---
 
@@ -683,6 +594,7 @@ Jika ada pertanyaan atau issue, silakan:
 - Review error message dengan teliti
 - Periksa kembali langkah instalasi
 - Pastikan semua dependencies sudah terinstall
+- Verifikasi database sudah berjalan dan dikonfigurasi dengan benar
 
 ---
 
