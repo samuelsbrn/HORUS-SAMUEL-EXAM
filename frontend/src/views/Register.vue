@@ -33,7 +33,7 @@ const errorMsg = ref('');
 const handleRegister = async () => {
   try {
     await api.post('/users/register', form.value);
-    alert('Registrasi berhasil! Silakan login.');
+    alert('Registrasi berhasil');
     router.push('/login');
   } catch (error) {
     errorMsg.value = error.response?.data?.message || 'Gagal mendaftar';

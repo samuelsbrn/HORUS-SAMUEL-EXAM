@@ -48,7 +48,7 @@ const handleUpdate = async () => {
   try {
     const userId = route.params.id;
     await api.put(`/users/${userId}`, form.value);
-    alert('Data berhasil diupdate!');
+    alert('Data user berhasil diperbarui');
     localStorage.removeItem('editUser');
     router.push('/dashboard');
   } catch (error) {
